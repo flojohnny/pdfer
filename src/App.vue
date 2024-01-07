@@ -1,21 +1,67 @@
 <template>
   <div id="app">
-    <h1>{{ message }}</h1>
+    <div class="search-container">
+      <input
+        id="query"
+        class="usr-input"
+        type="text"
+        placeholder="Search..."
+        v-model="query"
+        tabindex="0"
+      />
+      <button class="usr-btn" @click="updateQuery(query)" tabindex="0">
+        Search
+      </button>
+    </div>
+    <div class="results-container">
+      <list-view
+        class="list-view"
+        :matches="results"
+        @select-pdf="updateSelectedPdf()"
+      ></list-view>
+      <pdf-view></pdf-view>
+    </div>
   </div>
 </template>
 
 <script>
+import ListView from "./components/ListView.vue";
+import PdfView from "./components/PdfView.vue";
+
 export default {
   data() {
     return {
-      message: "",
+      query: "",
+      results: {},
     };
   },
+  components: {
+    ListView,
+    PdfView,
+  },
   mounted() {
+    // when the app is mounted
   },
   methods: {
+    async updateQuery(query) {
+      const newQuery = query;
+      const response = await fetch("http://localhost:5000/api/update_query", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: newQuery }),
+      });
 
-  }
+      const data = await response.json();
+      this.results = data.matches;
+      console.log(JSON.stringify(this.results));
+    },
+
+    updateSelectedPdf() {
+      // update the selected pdf
+    },
+  },
 };
 </script>
 
@@ -29,67 +75,51 @@ body {
   color: #fff;
 }
 
-#app {
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  background-color: #333;
-}
-
-#query {
-  width: 100%;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 20px, 10px, 20px, 10px;
-  background-color: #444;
-  color: #fff;
-}
-
-#list-component {
+.search-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
 
-.listview {
+.usr-input {
+  width: 80%;
+  margin-right: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  background-color: #444;
-}
-
-#list {
-  list-style-type:none;
-  padding: 0;
-  margin: 0;
-}
-
-li {
   padding: 10px;
-  border-bottom: 1px solid #ddd;
-  cursor: pointer;
+  background-color: #444;
   color: #fff;
-  transition: background-color 0.3s;
-  user-select: none;
-  opacity: 1;
 }
 
-li:hover {
-  background-color: #3f889c;
-}
-
-#pdf-container {
-  width: 100%;
-  height: 500px; /* Set your preferred height */
+.usr-btn {
+  width: 20%;
   border: 1px solid #ddd;
   border-radius: 4px;
-  overflow: hidden;
+  padding: 10px;
   background-color: #444;
+  color: #fff;
+  cursor: pointer;
 }
 
-#pdf-container embed {
-  width: 100%;
-  height: 100%;
+.usr-btn:hover {
+  background-color: #333;
+}
+
+.results-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.list-view {
+  width: 50%;
+  float: left;
+}
+
+@media (max-width: 768px) {
+  .results-container {
+    flex-direction: column;
+  }
 }
 </style>
