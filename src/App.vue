@@ -20,8 +20,9 @@
         :selection="selection"
         @add-page="addPageToSelection"
         @remove-page="removePageFromSelection"
+        @view-page="viewPage"
       ></list-view>
-      <pdf-view></pdf-view>
+      <pdf-view class="pdf-view" :selectedPage="selectedPage"></pdf-view>
     </div>
   </div>
 </template>
@@ -36,6 +37,7 @@ export default {
       query: "",
       results: {},
       selection: {},
+      selectedPage: {},
     };
   },
   components: {
@@ -85,9 +87,13 @@ export default {
     },
 
     clearSelection() {
-      this.selection = {...{}};
+      this.selection = { ...{} };
     },
 
+    viewPage(page) {
+      this.selectedPage = page;
+      this.selectedPage = { ...this.selectedPage };
+    },
   },
 };
 </script>
@@ -107,6 +113,7 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  background-color: red;
 }
 
 .usr-input {
@@ -134,18 +141,19 @@ body {
 }
 
 .results-container {
-  display: flex;
-  flex-direction: row;
-  align-items: start;
+  border-top: 1px #222;
+  background-color: blue;
+}
+
+.list-view {
+  width: 50%;
+}
+
+.pdf-view {
+  width: 50%;
 }
 
 .list-view {
   float: left;
-}
-
-@media (max-width: 768px) {
-  .results-container {
-    flex-direction: column;
-  }
 }
 </style>

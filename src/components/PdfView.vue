@@ -1,15 +1,35 @@
 <template>
   <div id="pdf-container">
-    <embed src="" width="100%" height="100%" alt="pdf" />
+    <a ref="pdf" :href="selectedPagePath" target="_blank" rel="noopener noreferrer">
+      <embed
+        :src="selectedPagePath"
+        type="application/pdf"
+        width="100%"
+        height="100%"
+      />
+    </a>
   </div>
 </template>
 
 <script>
 export default {
+  props: {
+    selectedPage: {
+      type: Object,
+      required: true,
+    },
+  },
+
   data() {
     return {
-      message: "",
+      selectedPagePath: "",
     };
+  },
+  watch: {
+    selectedPage() {
+      this.selectedPagePath = this.selectedPage.pdf // + "#page=" + this.selectedPage.page
+    },
+
   },
   mounted() {},
   methods: {
@@ -21,6 +41,4 @@ export default {
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

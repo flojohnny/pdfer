@@ -1,6 +1,6 @@
 <template>
   <div class="list-container">
-    <ul class="main-list" v-if="Object.keys(results).length > 0">
+    <ul class="main-list" v-if="Object.keys(results).length > 0 || Object.keys(selection).length > 0">
       <ul
         class="sub-list"
         v-for="[pdf, pages] in Object.entries(results)"
@@ -15,7 +15,7 @@
           </div>
         </li>
 
-        <li class="page-object" v-for="page in pages" :key="page.page">
+        <li class="page-object" v-for="page in pages" :key="page.page" @click="viewPage(page)">
           <h1 class="page-number">
             {{ page.page }}
           </h1>
@@ -107,6 +107,9 @@ export default {
       // remove the page from the selection
       this.$emit("remove-page", page);
     },
+    viewPage(page){
+      this.$emit("view-page", page);
+    }
   },
 };
 </script>
@@ -120,37 +123,36 @@ h1 {
   text-align: left;
 }
 
-ul {
+.list-container {
+  display: flex;
+  flex-direction: row;
+  background-color: #72967f;
+}
+
+.main-list {
+  width: 50%;
+  padding: 0;
+  justify-self: left;
+}
+
+.selected-list {
+  width: 50%;
+  padding: 0;
+  justify-self: right;
+}
+
+.sub-list {
   text-align: center;
   margin: 0;
   padding: 0;
   list-style: none;
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
 }
 
-.list-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: start;
-}
-
-.main-list {
-  width:fit-content;
-  height: 100%;
-  overflow-y: scroll;
-  padding: 0;
-}
-
-.selected-list {
-  width: fit-content;
-  height: 100%;
-  overflow-y: scroll;
-  padding: 0;
-}
 
 .pdf-object {
+  height: fit-content;
   cursor: pointer;
   display: flex;
   flex-direction: row;
@@ -161,6 +163,11 @@ ul {
   box-shadow: 1px 1px 3px rgba(83, 83, 83, 0.445);
   background: #444;
   margin: 5px;
+}
+
+.pdf-path {
+  width: 75%;
+  word-wrap: break-word;
 }
 
 .page-object {
