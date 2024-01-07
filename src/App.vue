@@ -17,7 +17,9 @@
       <list-view
         class="list-view"
         :matches="results"
-        @select-pdf="updateSelectedPdf()"
+        :selection="selection"
+        @add-page="addPageToSelection"
+        @remove-page="removePageFromSelection"
       ></list-view>
       <pdf-view></pdf-view>
     </div>
@@ -33,6 +35,7 @@ export default {
     return {
       query: "",
       results: {},
+      selection: {},
     };
   },
   components: {
@@ -44,6 +47,7 @@ export default {
   },
   methods: {
     async updateQuery(query) {
+      this.clearSelection();
       const newQuery = query;
       const response = await fetch("http://localhost:5000/api/update_query", {
         method: "POST",
@@ -58,9 +62,32 @@ export default {
       console.log(JSON.stringify(this.results));
     },
 
-    updateSelectedPdf() {
-      // update the selected pdf
+    addPageToSelection(page) {
+      const pdf = page.pdf;
+      if (pdf in this.selection) {
+        this.selection[pdf].push(page);
+      } else {
+        this.selection[pdf] = [page];
+      }
+
+      this.selection = { ...this.selection };
     },
+
+    removePageFromSelection(page) {
+      const pdf = page.pdf;
+      const index = this.selection[pdf].indexOf(page);
+      this.selection[pdf].splice(index, 1);
+      if (this.selection[pdf].length === 0) {
+        delete this.selection[pdf];
+      }
+
+      this.selection = { ...this.selection };
+    },
+
+    clearSelection() {
+      this.selection = {...{}};
+    },
+
   },
 };
 </script>
@@ -108,12 +135,11 @@ body {
 
 .results-container {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: row;
+  align-items: start;
 }
 
 .list-view {
-  width: 50%;
   float: left;
 }
 

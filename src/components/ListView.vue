@@ -1,40 +1,52 @@
 <template>
   <div class="list-container">
-    <ul class="main-list" v-if="Object.keys(matches).length > 0">
-      <ul class="sub-list" v-for="[pdf, pages] in Object.entries(matches)" :key="pdf">
-        <h1 id="pdf_title">{{ pdf }}</h1>
-        <li v-for="page in pages" :key="page.page">
-          <div class="pdf-object">
-            <button class="select-btn" @click="selectPdf(index)">
-              <h2>
-                {{ page.page }}
-              </h2>
-              <span class="icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                >
-                  <line
-                    x1="0"
-                    y1="0"
-                    x2="24"
-                    y2="24"
-                    stroke="#000"
-                    stroke-width="3"
-                  />
-                  <line
-                    x1="0"
-                    y1="24"
-                    x2="24"
-                    y2="0"
-                    stroke="#000"
-                    stroke-width="3"
-                  />
-                </svg>
-              </span>
-            </button>
+    <ul class="main-list" v-if="Object.keys(results).length > 0">
+      <ul
+        class="sub-list"
+        v-for="[pdf, pages] in Object.entries(results)"
+        :key="pdf"
+      >
+        <li class="pdf-object">
+          <h1 class="pdf-path">
+            {{ pdf }}
+          </h1>
+          <div>
+            <button class="add-btn" @click="addPdf(pdf)"></button>
+          </div>
+        </li>
+
+        <li class="page-object" v-for="page in pages" :key="page.page">
+          <h1 class="page-number">
+            {{ page.page }}
+          </h1>
+          <div>
+            <button class="add-btn" @click="addPage(page)"></button>
+          </div>
+        </li>
+      </ul>
+    </ul>
+
+    <ul class="selected-list" v-if="Object.keys(selected).length > 0">
+      <ul
+        class="sub-list"
+        v-for="[pdf, pages] in Object.entries(selected)"
+        :key="pdf"
+      >
+        <li class="pdf-object">
+          <h1 class="pdf-path">
+            {{ pdf }}
+          </h1>
+          <div>
+            <button class="remove-btn" @click="removePdf(pdf)"></button>
+          </div>
+        </li>
+
+        <li class="page-object" v-for="page in pages" :key="page.page">
+          <h1 class="page-number">
+            {{ page.page }}
+          </h1>
+          <div>
+            <button class="remove-btn" @click="removePage(page)"></button>
           </div>
         </li>
       </ul>
@@ -48,94 +60,156 @@ export default {
       type: Object,
       required: true,
     },
+    selection: {
+      type: Object,
+      required: true,
+    },
   },
   watch: {
     matches() {
-      
+      this.selected = {};
+      this.results = this.matches;
+    },
+    selection() {
+      this.selected = this.selection;
+      console.log(this.selected);
     },
   },
   data() {
-    return {};
+    return {
+      selected: {},
+      results: {},
+    };
   },
   mounted() {},
   methods: {
-    selectPdf(index) {
-      this.$emit("select-pdf", index);
+    addPage(page) {
+      const pdf = page.pdf;
+      // remove the page from the results
+      const pdfPages = this.results[pdf];
+      const index = pdfPages.indexOf(page);
+      pdfPages.splice(index, 1);
+      if (pdfPages.length === 0) {
+        delete this.results[pdf];
+      }
+
+      // add the page to the selection
+      this.$emit("add-page", page);
+    },
+    removePage(page) {
+      const pdf = page.pdf;
+      // add the page back to the results
+      if (pdf in this.results) {
+        this.results[pdf].push(page);
+      } else {
+        this.results[pdf] = [page];
+      }
+      // remove the page from the selection
+      this.$emit("remove-page", page);
     },
   },
 };
 </script>
 
 <style>
-
 h1 {
   margin: 0;
   padding: 10px;
   font-size: 0.8rem;
-  font-weight: bold;
-  text-align:left;
+  font-weight: normal;
+  text-align: left;
 }
 
 ul {
   text-align: center;
   margin: 0;
   padding: 0;
+  list-style: none;
+  display: inline-flex;
+  flex-direction: column;
 }
 
-li {
-  display: inline;
-  vertical-align: top;
+.list-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.main-list {
+  width:fit-content;
+  height: 100%;
+  overflow-y: scroll;
+  padding: 0;
+}
+
+.selected-list {
+  width: fit-content;
+  height: 100%;
+  overflow-y: scroll;
+  padding: 0;
 }
 
 .pdf-object {
-  align-items: start;
-  margin-left: 20px;
-  padding: 1px;
-}
-
-.select-btn {
-  width: 100px;
-  height: 25px;
   cursor: pointer;
   display: flex;
+  flex-direction: row;
   align-items: center;
-  border: none;
+  justify-content: space-between;
+  border: 1px solid rgba(144, 144, 144, 0.393);
   border-radius: 5px;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
-  background: #767676;
+  box-shadow: 1px 1px 3px rgba(83, 83, 83, 0.445);
+  background: #444;
+  margin: 5px;
 }
 
-.select-btn .text {
-  transform: translateX(5px);
-  color: rgb(0, 0, 0);
+.page-object {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(144, 144, 144, 0.393);
+  border-radius: 5px;
+  box-shadow: 1px 1px 3px rgba(83, 83, 83, 0.445);
+  background: #444;
+  margin: 5px;
+  margin-left: 50px;
+}
+
+.page-object .page-number {
+  color: rgb(255, 255, 255);
   font-weight: bold;
 }
 
-.select-btn .icon {
-  position: relative;
-  margin-left: auto;
-  margin-right: 0px;
-  height: 24px;
-  width: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.add-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  border: none;
+  background: #1ab553;
+  cursor: pointer;
+  margin: 0 5px;
 }
 
-.select-btn svg {
-  width: 15px;
-  fill: #000000;
+.add-btn:hover {
+  background: #1d743d;
+  border: 1px solid #8baa96;
 }
 
-.select-btn:hover {
-  background: #b33e3e;
+.remove-btn {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 10px;
+  border: none;
+  background: #b51a1a;
+  cursor: pointer;
+  margin: 0 5px;
 }
 
-.select-btn:focus {
-  outline: none;
-}
-
-.select-btn:active .icon svg {
-  transform: scale(0.8);
+.remove-btn:hover {
+  background: #741d1d;
+  border: 1px solid #aa8b8b;
 }
 </style>
