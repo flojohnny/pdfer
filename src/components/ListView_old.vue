@@ -1,25 +1,59 @@
 <template>
   <div class="list-container">
-    <list-section
-      v-if="Object.keys(results).length > 0 || Object.keys(selection).length > 0"
-      :items="results"
-      @add="addPdf"
-      @remove="removePdf"
-      @view="viewPage"
-    />
+    <ul class="main-list" v-if="Object.keys(results).length > 0 || Object.keys(selection).length > 0">
+      <ul
+        class="sub-list"
+        v-for="[pdf, pages] in Object.entries(results)"
+        :key="pdf"
+      >
+        <li class="pdf-object">
+          <h1 class="pdf-path">
+            {{ pdf }}
+          </h1>
+          <div>
+            <button class="add-btn" @click="addPdf(pdf)"></button>
+          </div>
+        </li>
 
-    <list-section
-      v-if="Object.keys(selected).length > 0"
-      :items="selected"
-      @add="addPdf"
-      @remove="removePdf"
-    />
+        <li class="page-object" v-for="page in pages" :key="page.page" @click="viewPage(page)">
+          <h1 class="page-number">
+            {{ page.page }}
+          </h1>
+          <div>
+            <button class="add-btn" @click="addPage(page)"></button>
+          </div>
+        </li>
+      </ul>
+    </ul>
+
+    <ul class="selected-list" v-if="Object.keys(selected).length > 0">
+      <ul
+        class="sub-list"
+        v-for="[pdf, pages] in Object.entries(selected)"
+        :key="pdf"
+      >
+        <li class="pdf-object">
+          <h1 class="pdf-path">
+            {{ pdf }}
+          </h1>
+          <div>
+            <button class="remove-btn" @click="removePdf(pdf)"></button>
+          </div>
+        </li>
+
+        <li class="page-object" v-for="page in pages" :key="page.page">
+          <h1 class="page-number">
+            {{ page.page }}
+          </h1>
+          <div>
+            <button class="remove-btn" @click="removePage(page)"></button>
+          </div>
+        </li>
+      </ul>
+    </ul>
   </div>
 </template>
-
 <script>
-import ListSection from "@/components/ListSection"; // Adjust the path based on your project structure
-
 export default {
   props: {
     matches: {
@@ -31,14 +65,6 @@ export default {
       required: true,
     },
   },
-
-  data() {
-    return {
-      selected: {},
-      results: {},
-    };
-  },
-
   watch: {
     matches() {
       this.selected = {};
@@ -48,7 +74,13 @@ export default {
       this.selected = this.selection;
     },
   },
-
+  data() {
+    return {
+      selected: {},
+      results: {},
+    };
+  },
+  mounted() {},
   methods: {
     addPage(page) {
       const pdf = page.pdf;
@@ -77,10 +109,6 @@ export default {
     viewPage(page){
       this.$emit("view-page", page);
     }
-  },
-
-  components: {
-    ListSection,
   },
 };
 </script>

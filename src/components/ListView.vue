@@ -1,62 +1,30 @@
 <template>
   <div class="list-container">
-    <ul class="main-list" v-if="Object.keys(results).length > 0 || Object.keys(selection).length > 0">
-      <ul
-        class="sub-list"
-        v-for="[pdf, pages] in Object.entries(results)"
-        :key="pdf"
-      >
-        <li class="pdf-object">
-          <h1 class="pdf-path">
-            {{ pdf }}
-          </h1>
-          <div>
-            <button class="add-btn" @click="addPdf(pdf)"></button>
-          </div>
-        </li>
+    <list-section
+      v-if="
+        Object.keys(unselectedPages).length > 0 ||
+        Object.keys(selection).length > 0
+      "
+      :type="'unselected'"
+      :items="unselectedPages"
+      @add="addPagesToSelection"
+    />
 
-        <li class="page-object" v-for="page in pages" :key="page.page" @click="viewPage(page)">
-          <h1 class="page-number">
-            {{ page.page }}
-          </h1>
-          <div>
-            <button class="add-btn" @click="addPage(page)"></button>
-          </div>
-        </li>
-      </ul>
-    </ul>
-
-    <ul class="selected-list" v-if="Object.keys(selected).length > 0">
-      <ul
-        class="sub-list"
-        v-for="[pdf, pages] in Object.entries(selected)"
-        :key="pdf"
-      >
-        <li class="pdf-object">
-          <h1 class="pdf-path">
-            {{ pdf }}
-          </h1>
-          <div>
-            <button class="remove-btn" @click="removePdf(pdf)"></button>
-          </div>
-        </li>
-
-        <li class="page-object" v-for="page in pages" :key="page.page">
-          <h1 class="page-number">
-            {{ page.page }}
-          </h1>
-          <div>
-            <button class="remove-btn" @click="removePage(page)"></button>
-          </div>
-        </li>
-      </ul>
-    </ul>
+    <list-section
+      v-if="Object.keys(selectedPages).length > 0"
+      :type="'selected'"
+      :items="selectedPages"
+      @remove="removePageFromSelection"
+    />
   </div>
 </template>
+
 <script>
+import ListSection from "@/components/ListSection"; // Adjust the path based on your project structure
+
 export default {
   props: {
-    matches: {
+    allPages: {
       type: Object,
       required: true,
     },
@@ -65,51 +33,55 @@ export default {
       required: true,
     },
   },
-  watch: {
-    matches() {
-      this.selected = {};
-      this.results = this.matches;
-    },
-    selection() {
-      this.selected = this.selection;
-      console.log(this.selected);
-    },
-  },
+
   data() {
     return {
-      selected: {},
-      results: {},
+      selectedPages: {},
+      unselectedPages: {},
     };
   },
-  mounted() {},
+
+  watch: {
+    allPages() {
+      console.log("allPages changed", JSON.stringify(this.allPages));
+      this.selectedPages = {};
+      this.unselectedPages = this.allPages;
+    },
+    selection() {
+      console.log("selection changed", JSON.stringify(this.selection));
+      this.selectedPages = this.selection;
+    },
+  },
+
   methods: {
-    addPage(page) {
-      const pdf = page.pdf;
-      // remove the page from the results
-      const pdfPages = this.results[pdf];
-      const index = pdfPages.indexOf(page);
-      pdfPages.splice(index, 1);
-      if (pdfPages.length === 0) {
-        delete this.results[pdf];
+    addPagesToSelection(pages) {
+      for (const page of pages) {
+        const pdf = page.pdf;
+        const pdfPages = this.unselectedPages[pdf];
+        const index = pdfPages.indexOf(page);
+        pdfPages.splice(index, 1);
+        if (pdfPages.length === 0) {
+          delete this.unselectedPages[pdf];
+        }
       }
 
-      // add the page to the selection
-      this.$emit("add-page", page);
+      this.$emit("add-pages", pages);
     },
-    removePage(page) {
+    removePageFromSelection(page) {
       const pdf = page.pdf;
       // add the page back to the results
-      if (pdf in this.results) {
-        this.results[pdf].push(page);
+      if (pdf in this.unselectedPages) {
+        this.unselectedPages[pdf].push(page);
       } else {
-        this.results[pdf] = [page];
+        this.unselectedPages[pdf] = [page];
       }
       // remove the page from the selection
       this.$emit("remove-page", page);
     },
-    viewPage(page){
-      this.$emit("view-page", page);
-    }
+  },
+
+  components: {
+    ListSection,
   },
 };
 </script>
@@ -148,7 +120,6 @@ h1 {
   display: flex;
   flex-direction: column;
 }
-
 
 .pdf-object {
   height: fit-content;

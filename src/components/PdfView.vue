@@ -28,7 +28,6 @@ export default {
   watch: {
     selectedPage() {
       this.selectedPagePath = tempPDF + "#view=fitH";
-      console.log(this.selectedPagePath);
     },
   },
   mounted() {},

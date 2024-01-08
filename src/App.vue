@@ -16,9 +16,9 @@
     <div class="results-container">
       <list-view
         class="list-view"
-        :matches="results"
+        :allPages="results"
         :selection="selection"
-        @add-page="addPageToSelection"
+        @add-pages="addPagesToSelection"
         @remove-page="removePageFromSelection"
         @view-page="viewPage"
       ></list-view>
@@ -61,7 +61,6 @@ export default {
 
       const data = await response.json();
       this.results = data.matches;
-      console.log(JSON.stringify(this.results));
     },
 
     async viewPage(page) {
@@ -77,16 +76,16 @@ export default {
       this.selectedPage = data.page;
 
       this.selectedPage = { ...this.selectedPage };
-
-      console.log(JSON.stringify(this.selectedPage));
     },
 
-    addPageToSelection(page) {
-      const pdf = page.pdf;
-      if (pdf in this.selection) {
-        this.selection[pdf].push(page);
-      } else {
-        this.selection[pdf] = [page];
+    addPagesToSelection(pages) {
+      for (const page of pages) {
+        const pdf = page.pdf;
+        if (pdf in this.selection) {
+          this.selection[pdf].push(page);
+        } else {
+          this.selection[pdf] = [page];
+        }
       }
 
       this.selection = { ...this.selection };
@@ -106,7 +105,6 @@ export default {
     clearSelection() {
       this.selection = { ...{} };
     },
-
   },
 };
 </script>
@@ -164,7 +162,6 @@ body {
   color: #fff;
   height: 100vh;
   overflow: hidden;
-
 }
 
 .list-view {
