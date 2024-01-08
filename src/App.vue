@@ -64,6 +64,23 @@ export default {
       console.log(JSON.stringify(this.results));
     },
 
+    async viewPage(page) {
+      const response = await fetch("http://localhost:5000/api/update_page", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ page: page }),
+      });
+
+      const data = await response.json();
+      this.selectedPage = data.page;
+
+      this.selectedPage = { ...this.selectedPage };
+
+      console.log(JSON.stringify(this.selectedPage));
+    },
+
     addPageToSelection(page) {
       const pdf = page.pdf;
       if (pdf in this.selection) {
@@ -90,10 +107,6 @@ export default {
       this.selection = { ...{} };
     },
 
-    viewPage(page) {
-      this.selectedPage = page;
-      this.selectedPage = { ...this.selectedPage };
-    },
   },
 };
 </script>
@@ -141,8 +154,17 @@ body {
 }
 
 .results-container {
-  border-top: 1px #222;
-  background-color: blue;
+  display: flex;
+  flex-direction: row;
+
+  justify-content: space-between;
+  align-items: top;
+  padding: 20px;
+  background-color: #444;
+  color: #fff;
+  height: 100vh;
+  overflow: hidden;
+
 }
 
 .list-view {
@@ -150,6 +172,7 @@ body {
 }
 
 .pdf-view {
+  height: 100%;
   width: 50%;
 }
 

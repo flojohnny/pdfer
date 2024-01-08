@@ -13,3 +13,14 @@ def configure_routes(app, app_data: Pdfly):
             return jsonify(matches=matches), 200
         
         return jsonify(error="query not provided"), 400
+
+    @app.route("/api/update_page", methods=["POST"])
+    def update_page():
+        data: dict = request.get_json()
+        new_page = data.get("page")
+
+        if new_page:
+            app_data.update_page(new_page)
+            return jsonify(message="page updated"), 200
+        
+        return jsonify(error="page not provided"), 400

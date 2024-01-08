@@ -1,17 +1,17 @@
 <template>
   <div id="pdf-container">
-    <a ref="pdf" :href="selectedPagePath" target="_blank" rel="noopener noreferrer">
-      <embed
-        :src="selectedPagePath"
-        type="application/pdf"
-        width="100%"
-        height="100%"
-      />
-    </a>
+    <embed
+      :src="selectedPagePath"
+      type="application/pdf"
+      width="100%"
+      height="100%"
+    />
   </div>
 </template>
 
 <script>
+import tempPDF from "../assets/temp.pdf";
+
 export default {
   props: {
     selectedPage: {
@@ -22,14 +22,14 @@ export default {
 
   data() {
     return {
-      selectedPagePath: "",
+      selectedPagePath: tempPDF,
     };
   },
   watch: {
     selectedPage() {
-      this.selectedPagePath = this.selectedPage.pdf // + "#page=" + this.selectedPage.page
+      this.selectedPagePath = tempPDF + "#view=fitH";
+      console.log(this.selectedPagePath);
     },
-
   },
   mounted() {},
   methods: {

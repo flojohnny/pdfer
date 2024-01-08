@@ -126,7 +126,6 @@ h1 {
 .list-container {
   display: flex;
   flex-direction: row;
-  background-color: #72967f;
 }
 
 .main-list {

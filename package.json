@@ -2,13 +2,17 @@
   "name": "vue-flask",
   "version": "0.1.0",
   "private": true,
+  "main": "background.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "electron:serve": "vue-cli-service electron:serve",
+    "electron:build": "vue-cli-service electron:build"
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "electron-devtools-installer": "^3.2.0",
     "vue": "^3.2.13"
   },
   "devDependencies": {
@@ -17,8 +21,11 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "electron": "^28.1.1",
     "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3"
+    "eslint-plugin-vue": "^8.0.3",
+    "file-loader": "^6.2.0",
+    "vue-cli-plugin-electron-builder": "~2.1.1"
   },
   "eslintConfig": {
     "root": true,
