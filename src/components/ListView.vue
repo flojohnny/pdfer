@@ -2,19 +2,19 @@
   <div class="list-container">
     <list-section
       v-if="
-        Object.keys(unselectedPages).length > 0 ||
-        Object.keys(selection).length > 0
+        Object.keys(benched).length > 0 ||
+        Object.keys(active).length > 0
       "
       :type="'unselected'"
-      :items="unselectedPages"
-      @add="addPagesToSelection"
+      :items="benched"
+      @add="addPagesToSelected"
     />
 
     <list-section
-      v-if="Object.keys(selectedPages).length > 0"
+      v-if="Object.keys(active).length > 0"
       :type="'selected'"
-      :items="selectedPages"
-      @remove="removePageFromSelection"
+      :items="active"
+      @remove="removePagesFromSelected"
     />
   </div>
 </template>
@@ -24,11 +24,15 @@ import ListSection from "@/components/ListSection"; // Adjust the path based on 
 
 export default {
   props: {
-    allPages: {
+    allResults: {
       type: Object,
       required: true,
     },
-    selection: {
+    activeResults: {
+      type: Object,
+      required: true,
+    },
+    benchedResults:{
       type: Object,
       required: true,
     },
@@ -36,47 +40,33 @@ export default {
 
   data() {
     return {
-      selectedPages: {},
-      unselectedPages: {},
+      active: {},
+      benched: {},
     };
   },
 
   watch: {
-    allPages() {
-      console.log("allPages changed", JSON.stringify(this.allPages));
-      this.selectedPages = {};
-      this.unselectedPages = this.allPages;
+    allResults() {
+      console.log("allResults changed", JSON.stringify(this.allResults));
+      this.active = {};
+      this.benched = this.allResults;
     },
-    selection() {
-      console.log("selection changed", JSON.stringify(this.selection));
-      this.selectedPages = this.selection;
+    activeResults() {
+      console.log("activeResults changed", JSON.stringify(this.activeResults));
+      this.active = this.activeResults;
+    },
+    benchedResults() {
+      console.log("benchedResults changed", JSON.stringify(this.benchedResults));
+      this.benched = this.benchedResults;
     },
   },
 
   methods: {
-    addPagesToSelection(pages) {
-      for (const page of pages) {
-        const pdf = page.pdf;
-        const pdfPages = this.unselectedPages[pdf];
-        const index = pdfPages.indexOf(page);
-        pdfPages.splice(index, 1);
-        if (pdfPages.length === 0) {
-          delete this.unselectedPages[pdf];
-        }
-      }
-
+    addPagesToSelected(pages) {
       this.$emit("add-pages", pages);
     },
-    removePageFromSelection(page) {
-      const pdf = page.pdf;
-      // add the page back to the results
-      if (pdf in this.unselectedPages) {
-        this.unselectedPages[pdf].push(page);
-      } else {
-        this.unselectedPages[pdf] = [page];
-      }
-      // remove the page from the selection
-      this.$emit("remove-page", page);
+    removePagesFromSelected(pages) {
+      this.$emit("remove-pages", pages);
     },
   },
 

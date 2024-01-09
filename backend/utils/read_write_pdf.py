@@ -31,13 +31,14 @@ def extract_page(source_writer: PyPDF2.PdfWriter, page: dict):
             source_writer.add_page(source_page)
 
 
-def save_selected_pages_to_temp_pdf(pages: dict, folder_path_results="./src/assets"):
+def save_selected_pages_to_temp_pdf(active_results: dict, folder_path_results="./src/assets"):
     output_pdf_name = f"temp.pdf"
     source_writer = PyPDF2.PdfWriter()
     destination_path = os.path.join(folder_path_results, output_pdf_name)
 
-    for page in pages:
-        extract_page(source_writer, pages)
+    for pdf in active_results:
+        for page in active_results[pdf]:
+            extract_page(source_writer, page)
 
     with open(destination_path, "wb") as destination_file:
         source_writer.write(destination_file)

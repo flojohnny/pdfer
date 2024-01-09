@@ -16,11 +16,11 @@
     <div class="results-container">
       <list-view
         class="list-view"
-        :allPages="results"
-        :selection="selection"
-        @add-pages="addPagesToSelection"
-        @remove-page="removePageFromSelection"
-        @view-page="viewPage"
+        :allResults="allResults"
+        :activeResults="activeResults"
+        :benchedResults="benchedResults"
+        @add-pages="activateResults"
+        @remove-pages="benchResults"
       ></list-view>
       <pdf-view class="pdf-view" :selectedPage="selectedPage"></pdf-view>
     </div>
@@ -35,18 +35,16 @@ export default {
   data() {
     return {
       query: "",
-      results: {},
-      selection: {},
-      selectedPage: {},
+      allResults: {},
+      activeResults: {},
+      benchedResults: {},
     };
   },
   components: {
     ListView,
     PdfView,
   },
-  mounted() {
-    // when the app is mounted
-  },
+  mounted() {},
   methods: {
     async updateQuery(query) {
       this.clearSelection();
@@ -60,50 +58,91 @@ export default {
       });
 
       const data = await response.json();
-      this.results = data.matches;
+      this.allResults = data.matches;
+      this.benchedResults = data.matches;
     },
 
-    async viewPage(page) {
-      const response = await fetch("http://localhost:5000/api/update_page", {
+    async updatePDF(pages) {
+      const response = await fetch("http://localhost:5000/api/update_pdf", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ page: page }),
+        body: JSON.stringify(pages),
       });
 
       const data = await response.json();
-      this.selectedPage = data.page;
-
-      this.selectedPage = { ...this.selectedPage };
+      console.log(data);
     },
 
-    addPagesToSelection(pages) {
+    activateResults(pages) {
+      // add pages to active results
       for (const page of pages) {
         const pdf = page.pdf;
-        if (pdf in this.selection) {
-          this.selection[pdf].push(page);
+        if (pdf in this.activeResults) {
+          this.activeResults[pdf].push(page);
         } else {
-          this.selection[pdf] = [page];
+          this.activeResults[pdf] = [page];
+        }
+      }
+      this.activeResults = { ...this.activeResults };
+
+      // remove pages from benched results
+      for (let i = pages.length - 1; i >= 0; i--) {
+        const page = pages[i];
+        const pdf = page.pdf;
+        if (pdf in this.benchedResults) {
+          const index = this.benchedResults[pdf].indexOf(page);
+          if (index > -1) {
+            this.benchedResults[pdf].splice(index, 1);
+            if (this.benchedResults[pdf].length === 0) {
+              delete this.benchedResults[pdf];
+            }
+          }
         }
       }
 
-      this.selection = { ...this.selection };
+      this.benchedResults = { ...this.benchedResults };
+
+      // update PDF
+      this.updatePDF(this.activeResults);
     },
 
-    removePageFromSelection(page) {
-      const pdf = page.pdf;
-      const index = this.selection[pdf].indexOf(page);
-      this.selection[pdf].splice(index, 1);
-      if (this.selection[pdf].length === 0) {
-        delete this.selection[pdf];
+    benchResults(pages) {
+      // add pages to benched results
+      for (const page of pages) {
+        const pdf = page.pdf;
+        if (pdf in this.benchedResults) {
+          this.benchedResults[pdf].push(page);
+        } else {
+          this.benchedResults[pdf] = [page];
+        }
+      }
+      this.benchedResults = { ...this.benchedResults };
+
+      // remove pages from active results
+      for (let i = pages.length - 1; i >= 0; i--) {
+        const page = pages[i];
+        const pdf = page.pdf;
+        if (pdf in this.activeResults) {
+          const index = this.activeResults[pdf].indexOf(page);
+          if (index > -1) {
+            this.activeResults[pdf].splice(index, 1);
+            if (this.activeResults[pdf].length === 0) {
+              delete this.activeResults[pdf];
+            }
+          }
+        }
       }
 
-      this.selection = { ...this.selection };
+      this.activeResults = { ...this.activeResults };
+
+      // update PDF
+      this.updatePDF(this.activeResults);
     },
 
     clearSelection() {
-      this.selection = { ...{} };
+      this.activeResults = { ...{} };
     },
   },
 };
@@ -124,7 +163,6 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  background-color: red;
 }
 
 .usr-input {

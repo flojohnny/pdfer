@@ -25,6 +25,6 @@ class Pdfly:
     def update_index(self):
         self.index = create_index.build_index(self.dirpath_pdfs)
 
-    def update_page(self, page: dict):
-        read_write_pdf.save_selected_pages_to_temp_pdf(page)
+    def update_pdf(self, active_results: dict):
+        read_write_pdf.save_selected_pages_to_temp_pdf(active_results)
         return True

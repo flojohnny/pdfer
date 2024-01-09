@@ -52,7 +52,6 @@ export default {
       required: true,
     },
   },
-  data() {},
   watch: {
     items() {
       this.localItems = this.items;
