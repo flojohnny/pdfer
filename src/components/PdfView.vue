@@ -1,40 +1,42 @@
 <template>
   <div id="pdf-container">
-    <embed
-      :src="selectedPagePath"
+    <iframe
+      :src="pdfUrl"
       type="application/pdf"
       width="100%"
       height="100%"
-    />
+    ></iframe>
   </div>
 </template>
 
 <script>
-import tempPDF from "../assets/temp.pdf";
+import tempPDF from "../assets/output.pdf";
 
 export default {
-  props: {
-    selectedPage: {
-      type: Object,
-      required: true,
-    },
-  },
-
   data() {
     return {
       selectedPagePath: tempPDF,
     };
   },
-  watch: {
-    selectedPage() {
-      this.selectedPagePath = tempPDF + "#view=fitH";
+  computed: {
+    pdfUrl() {
+      return this.selectedPagePath + "#toolbar=0";
     },
   },
-  mounted() {},
+  watch: {
+    selectedPage() {
+      this.selectedPagePath = tempPDF; // Update the PDF path as needed
+    },
+  },
+  mounted() {
+    this.loadPDF();
+  },
   methods: {
+    loadPDF() {
+      // You may load the PDF content using fetch or another method
+    },
     updatePDF(pdf) {
-      const embed = document.querySelector("embed");
-      embed.setAttribute("src", pdf);
+      this.selectedPagePath = pdf;
     },
   },
 };

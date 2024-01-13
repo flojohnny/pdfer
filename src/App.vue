@@ -22,7 +22,7 @@
         @add-pages="activateResults"
         @remove-pages="benchResults"
       ></list-view>
-      <pdf-view class="pdf-view" :selectedPage="selectedPage"></pdf-view>
+      <pdf-view class="pdf-view" v-if="Object.keys(activeResults).length > 0 && showPdf"></pdf-view>
     </div>
   </div>
 </template>
@@ -38,13 +38,16 @@ export default {
       allResults: {},
       activeResults: {},
       benchedResults: {},
+      showPdf: false,
     };
   },
   components: {
     ListView,
     PdfView,
   },
-  mounted() {},
+  mounted() {
+    this.updatePDF(this.activeResults);
+  },
   methods: {
     async updateQuery(query) {
       this.clearSelection();
@@ -63,6 +66,7 @@ export default {
     },
 
     async updatePDF(pages) {
+      this.showPdf = false;
       const response = await fetch("http://localhost:5000/api/update_pdf", {
         method: "POST",
         headers: {
@@ -71,8 +75,8 @@ export default {
         body: JSON.stringify(pages),
       });
 
-      const data = await response.json();
-      console.log(data);
+      await response.json();
+      this.showPdf = true;
     },
 
     activateResults(pages) {

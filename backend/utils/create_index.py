@@ -59,15 +59,7 @@ def index_pdf(pdf_path):
 
     return index
 
-
-def build_index(folder_path_pdfs):
-    index = {}
-    for filename in os.listdir(folder_path_pdfs):
-        if filename.endswith(".pdf"):
-            pdf_path = os.path.join(folder_path_pdfs, filename)
-            index[pdf_path] = index_pdf(pdf_path)
-
-    index = remove_stop_words(index)
-    index = apply_stemming(index)
-
+def add_pdf_to_index(pdf_path, index):
+    index[pdf_path] = index_pdf(pdf_path)
     return index
+

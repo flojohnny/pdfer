@@ -1,10 +1,7 @@
 <template>
   <div class="list-container">
     <list-section
-      v-if="
-        Object.keys(benched).length > 0 ||
-        Object.keys(active).length > 0
-      "
+      v-if="Object.keys(benched).length > 0 || Object.keys(active).length > 0"
       :type="'unselected'"
       :items="benched"
       @add="addPagesToSelected"
@@ -32,7 +29,7 @@ export default {
       type: Object,
       required: true,
     },
-    benchedResults:{
+    benchedResults: {
       type: Object,
       required: true,
     },
@@ -47,16 +44,13 @@ export default {
 
   watch: {
     allResults() {
-      console.log("allResults changed", JSON.stringify(this.allResults));
       this.active = {};
       this.benched = this.allResults;
     },
     activeResults() {
-      console.log("activeResults changed", JSON.stringify(this.activeResults));
       this.active = this.activeResults;
     },
     benchedResults() {
-      console.log("benchedResults changed", JSON.stringify(this.benchedResults));
       this.benched = this.benchedResults;
     },
   },

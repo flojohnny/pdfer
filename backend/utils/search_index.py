@@ -36,7 +36,7 @@ def search(query, index):
         match
         for match in matches
         if int(match["average_score"]) > 0 and \
-            len(match["keywords"]) == len(query.split())
+            len(match["keywords"]) >= len(query.split())
     ]
 
     # group matches by pdf

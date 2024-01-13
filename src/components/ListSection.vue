@@ -6,7 +6,7 @@
       :key="item"
     >
       <li class="list-object">
-        <h1 class="list-title">{{ item }}</h1>
+        <h1 class="list-title">{{ item.split('\\').pop().split('/').pop() }}</h1>
         <div>
           <button
             v-if="type === 'unselected'"
@@ -55,7 +55,6 @@ export default {
   watch: {
     items() {
       this.localItems = this.items;
-      console.log(this.type, "changed", JSON.stringify(this.items));
     },
   },
   methods: {
