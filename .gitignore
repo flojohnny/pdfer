@@ -4,7 +4,7 @@ node_modules
 
 index.json
 package-lock.json
-output.pdf
+*.pdf
 
 # local env files
 .env.local
